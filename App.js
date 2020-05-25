@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Alert, Modal, TouchableHighlight, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, Modal, TouchableHighlight, TextInput, Picker } from 'react-native';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
+
+const typesArray = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
 
 export default function App() {
   const [modalData, setModalData] = useState({
@@ -98,12 +100,15 @@ export default function App() {
           onChangeText={text => setName(text)}
           value={name}
         />
-        <TextInput
-          style={styles.centerText}
-          onChangeText={text => setType(text)}
-          value={type}
-          placeholder='Enter Food Type'
-        />
+        <Picker
+                  selectedValue={type}
+                  style={{ height: 50, width: 150 }}
+                  placeholder='Enter Food Type'
+                  onValueChange={(itemValue, itemIndex) => setType(itemValue)}>
+                  {typesArray.map(item => (
+                    <Picker.Item label={item} value={item} key={item}/>
+                  ))}
+        </Picker>
             <TouchableHighlight
               style={{ backgroundColor: "red" }}
               onPress={() => {
