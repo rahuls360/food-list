@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Alert, Modal, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, Modal, TouchableHighlight, TextInput } from 'react-native';
 import { Table, TableWrapper, Row, Cell } from 'react-native-table-component';
 
 export default function App() {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState({
+    visible: false,
+    id: '',
+  });
+  const [name, setName] = useState('');
+  const [type, setType] = useState('');
   const [tableHead, setTableHead] = useState(['Food', 'Type', 'Actions']);
   const [tableData, setTableData] = useState([
     ['Idli', 'Breakfast', 'idli'],
@@ -34,7 +39,13 @@ export default function App() {
         { cancelable: false }
       );
     }else {
-      setModalVisible(true);
+      setModalData({
+      visible: true,
+        id,
+      });
+      const editingRow = tableData.find(item => item[2] === id);
+      setName(editingRow[0]);
+      setType(editingRow[1]);
     }
   }
       const element = (data, index) => (
@@ -73,21 +84,61 @@ export default function App() {
         <Modal
           animationType="slide"
           transparent={true}
-          visible={modalVisible}
+          visible={modalData.visible}
           onRequestClose={() => {
             Alert.alert("Modal has been closed.");
           }}
+          placeholder='Enter Food Name'
         >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-            <Text>Modal open</Text>
+        <Text>Editing - {modalData.id}</Text>
+        <TextInput
+        style={styles.centerText}
+          onChangeText={text => setName(text)}
+          value={name}
+        />
+        <TextInput
+          style={styles.centerText}
+          onChangeText={text => setType(text)}
+          value={type}
+          placeholder='Enter Food Type'
+        />
             <TouchableHighlight
-              style={{ backgroundColor: "#2196F3" }}
+              style={{ backgroundColor: "red" }}
               onPress={() => {
-                setModalVisible(!modalVisible);
+                setModalData({
+                  visible: !modalData.visible,
+                  id: ''
+                });
+                setName('');
+                setType('');
               }}
             >
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              <Text style={styles.textStyle}>Cancel</Text>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={{ backgroundColor: "green" }}
+              onPress={() => {
+                let foundIndex;
+                const editingRow = tableData.find((item, index) => {
+                  foundIndex = index;
+                  return item[2] === modalData.id;
+                });
+                editingRow[0] = name;
+                editingRow[1] = type;
+                setModalData({
+                  visible: !modalData.visible,
+                  id: ''
+                });
+                setName('');
+                setType('');
+                const newTableData = [...tableData];
+                newTableData[foundIndex] = editingRow;
+                setTableData(newTableData);
+              }}
+            >
+              <Text style={styles.textStyle}>Save Changes</Text>
             </TouchableHighlight>
           </View>
           </View>
@@ -127,4 +178,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5
   },
+  centerText: {
+    textAlign: 'center'
+  }
 });
