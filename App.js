@@ -18,6 +18,7 @@ const typesArray = ['Breakfast', 'Lunch', 'Snack', 'Dinner'];
 export default function App() {
   const [modalData, setModalData] = useState({
     visible: false,
+    action: '',
     id: '',
   });
   const [name, setName] = useState('');
@@ -56,6 +57,7 @@ export default function App() {
     } else if (action === 'Edit') {
       setModalData({
         visible: true,
+        action: 'edit',
         id,
       });
       const editingRow = tableData.find((item) => item[2] === id);
@@ -63,7 +65,12 @@ export default function App() {
       setType(editingRow[1]);
     } else {
       // Add
-      console.log(new Date());
+      const newID = new Date();
+      setModalData({
+        visible: true,
+        action: 'add',
+        newID,
+      });
     }
   };
   const element = (data, index) => (
@@ -113,7 +120,11 @@ export default function App() {
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text>Editing - {modalData.id}</Text>
+              {modalData.action === 'edit' ? (
+                <Text>Editing - {modalData.id}</Text>
+              ) : (
+                <Text>Add a Food Item</Text>
+              )}
               <TextInput
                 style={styles.centerText}
                 onChangeText={(text) => setName(text)}
@@ -134,6 +145,7 @@ export default function App() {
                 onPress={() => {
                   setModalData({
                     visible: !modalData.visible,
+                    action: '',
                     id: '',
                   });
                   setName('');
@@ -145,25 +157,33 @@ export default function App() {
               <TouchableHighlight
                 style={{ backgroundColor: 'green' }}
                 onPress={() => {
-                  let foundIndex;
-                  const editingRow = tableData.find((item, index) => {
-                    foundIndex = index;
-                    return item[2] === modalData.id;
-                  });
-                  editingRow[0] = name;
-                  editingRow[1] = type;
-                  setModalData({
-                    visible: !modalData.visible,
-                    id: '',
-                  });
-                  setName('');
-                  setType('');
-                  const newTableData = [...tableData];
-                  newTableData[foundIndex] = editingRow;
-                  setTableData(newTableData);
+                  if (modalData.action === 'edit') {
+                    let foundIndex;
+                    const editingRow = tableData.find((item, index) => {
+                      foundIndex = index;
+                      return item[2] === modalData.id;
+                    });
+                    editingRow[0] = name;
+                    editingRow[1] = type;
+                    setModalData({
+                      visible: !modalData.visible,
+                      action: '',
+                      id: '',
+                    });
+                    setName('');
+                    setType('');
+                    const newTableData = [...tableData];
+                    newTableData[foundIndex] = editingRow;
+                    setTableData(newTableData);
+                  } else {
+                    // add
+                    setTableData([...tableData, [name, type, modalData.id]]);
+                  }
                 }}
               >
-                <Text style={styles.textStyle}>Save Changes</Text>
+                <Text style={styles.textStyle}>
+                  {modalData.action === 'edit' ? 'Save Changes' : 'Create'}
+                </Text>
               </TouchableHighlight>
             </View>
           </View>
