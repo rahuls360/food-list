@@ -93,20 +93,24 @@ export default function App() {
         <View style={styles.bottomPadding}>
           <Button title="Add" onPress={() => _alertIndex(null, 'Add')} />
         </View>
-        <Table borderStyle={{ borderColor: 'transparent' }}>
-          <Row data={tableHead} style={styles.head} textStyle={styles.text} />
-          {tableData.map((rowData, index) => (
-            <TableWrapper key={index} style={styles.row}>
-              {rowData.map((cellData, cellIndex) => (
-                <Cell
-                  key={cellIndex}
-                  data={cellIndex === 2 ? element(cellData, index) : cellData}
-                  textStyle={styles.text}
-                />
-              ))}
-            </TableWrapper>
-          ))}
-        </Table>
+        {tableData.length > 0 ? (
+          <Table borderStyle={{ borderColor: 'transparent' }}>
+            <Row data={tableHead} style={styles.head} textStyle={styles.text} />
+            {tableData.map((rowData, index) => (
+              <TableWrapper key={index} style={styles.row}>
+                {rowData.map((cellData, cellIndex) => (
+                  <Cell
+                    key={cellIndex}
+                    data={cellIndex === 2 ? element(cellData, index) : cellData}
+                    textStyle={styles.text}
+                  />
+                ))}
+              </TableWrapper>
+            ))}
+          </Table>
+        ) : (
+          <Text>You haven't added any food items yet</Text>
+        )}
       </View>
       <View style={styles.centeredView}>
         <Modal
@@ -127,6 +131,7 @@ export default function App() {
               )}
               <TextInput
                 style={styles.centerText}
+                placeholder="Enter Food Name"
                 onChangeText={(text) => setName(text)}
                 value={name}
               />
@@ -165,13 +170,6 @@ export default function App() {
                     });
                     editingRow[0] = name;
                     editingRow[1] = type;
-                    setModalData({
-                      visible: !modalData.visible,
-                      action: '',
-                      id: '',
-                    });
-                    setName('');
-                    setType('');
                     const newTableData = [...tableData];
                     newTableData[foundIndex] = editingRow;
                     setTableData(newTableData);
@@ -179,6 +177,14 @@ export default function App() {
                     // add
                     setTableData([...tableData, [name, type, modalData.id]]);
                   }
+                  // reset fields and close modal
+                  setModalData({
+                    visible: !modalData.visible,
+                    action: '',
+                    id: '',
+                  });
+                  setName('');
+                  setType('');
                 }}
               >
                 <Text style={styles.textStyle}>
