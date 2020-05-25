@@ -14,7 +14,28 @@ export default function App() {
  
   const _alertIndex = (id, action) => {
     // Alert.alert(`${action}ing ${id}`);
-    setModalVisible(true);
+    
+    if(action  === 'Delete'){
+      Alert.alert(
+        `Are you sure you want to delete ${id}`,
+        "",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          { text: "OK", onPress: () => {
+            const data = tableData.filter(item => item[2] !== id);
+            console.log("OK Pressed", data);
+            setTableData(data)
+          } }
+        ],
+        { cancelable: false }
+      );
+    }else {
+      setModalVisible(true);
+    }
   }
       const element = (data, index) => (
         <View style={styles.rowSpace}>
@@ -23,7 +44,7 @@ export default function App() {
             <Text style={styles.btnText}>Edit</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => _alertIndex(data, "Delet")}>
+        <TouchableOpacity onPress={() => _alertIndex(data, "Delete")}>
           <View style={styles.btn}>
             <Text style={styles.btnText}>Delete</Text>
           </View>
